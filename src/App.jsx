@@ -6,6 +6,7 @@ import TransactionForm from './components/TransactionForm'
 import Analytics from './components/Analytics'
 import TransactionList from './components/TransactionList'
 import Worksheets from './components/Worksheets'
+import Checklists from './components/Checklists'
 import Navigation from './components/Navigation'
 import { useExpenseData } from './hooks/useExpenseData'
 
@@ -17,6 +18,7 @@ function App() {
     { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { id: 'transactions', label: 'Transactions', icon: 'Receipt' },
     { id: 'worksheets', label: 'Worksheets', icon: 'FileSpreadsheet' },
+    { id: 'checklists', label: 'Checklists', icon: 'CheckSquare' },
     { id: 'analytics', label: 'Analytics', icon: 'TrendingUp' },
     { id: 'add', label: 'Add Expense', icon: 'Plus' }
   ]
@@ -33,6 +35,8 @@ function App() {
         />
       case 'worksheets':
         return <Worksheets transactions={transactions} />
+      case 'checklists':
+        return <Checklists />
       case 'analytics':
         return <Analytics transactions={transactions} />
       case 'add':

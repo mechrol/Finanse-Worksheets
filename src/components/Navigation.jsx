@@ -6,7 +6,8 @@ import {
   TrendingUp, 
   Plus,
   Wallet,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CheckSquare
 } from 'lucide-react'
 
 const iconMap = {
@@ -15,7 +16,8 @@ const iconMap = {
   TrendingUp,
   Plus,
   Wallet,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CheckSquare
 }
 
 const Navigation = ({ tabs, activeTab, onTabChange }) => {
