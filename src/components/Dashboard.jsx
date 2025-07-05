@@ -14,22 +14,32 @@ import CategoryChart from './CategoryChart'
 import RecentTransactions from './RecentTransactions'
 import BudgetProgress from './BudgetProgress'
 
-const Dashboard = ({ transactions }) => {
+const Dashboard = ({ transactions = [] }) => {
+  console.log('Dashboard received transactions:', transactions.length)
+  
   const currentMonth = new Date()
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(currentMonth)
 
-  const currentMonthTransactions = transactions.filter(transaction =>
-    isWithinInterval(new Date(transaction.date), { start: monthStart, end: monthEnd })
-  )
+  const currentMonthTransactions = transactions.filter(transaction => {
+    if (!transaction || !transaction.date) return false
+    try {
+      return isWithinInterval(new Date(transaction.date), { start: monthStart, end: monthEnd })
+    } catch (error) {
+      console.error('Error filtering transaction by date:', transaction, error)
+      return false
+    }
+  })
+
+  console.log('Current month transactions:', currentMonthTransactions.length)
 
   const totalIncome = currentMonthTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0)
+    .filter(t => t && t.type === 'income' && t.amount)
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
 
   const totalExpenses = currentMonthTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0)
+    .filter(t => t && t.type === 'expense' && t.amount)
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
 
   const balance = totalIncome - totalExpenses
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome * 100) : 0
@@ -79,6 +89,9 @@ const Dashboard = ({ transactions }) => {
         <p className="text-white/70 flex items-center justify-center space-x-2">
           <Calendar className="h-4 w-4" />
           <span>{format(currentMonth, 'MMMM yyyy')}</span>
+        </p>
+        <p className="text-xs text-white/50 mt-1">
+          {transactions.length} total transactions | {currentMonthTransactions.length} this month
         </p>
       </motion.div>
 

@@ -7,7 +7,8 @@ import {
   Plus,
   Wallet,
   FileSpreadsheet,
-  CheckSquare
+  CheckSquare,
+  Tractor
 } from 'lucide-react'
 
 const iconMap = {
@@ -17,7 +18,8 @@ const iconMap = {
   Plus,
   Wallet,
   FileSpreadsheet,
-  CheckSquare
+  CheckSquare,
+  Tractor
 }
 
 const Navigation = ({ tabs, activeTab, onTabChange }) => {
@@ -35,14 +37,14 @@ const Navigation = ({ tabs, activeTab, onTabChange }) => {
             <h1 className="text-xl font-bold gradient-text">ExpenseTracker Pro</h1>
           </motion.div>
 
-          <div className="flex space-x-1">
+          <div className="flex space-x-1 overflow-x-auto">
             {tabs.map((tab, index) => {
               const Icon = iconMap[tab.icon]
               return (
                 <motion.button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`relative px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 ${
+                  className={`relative px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 whitespace-nowrap ${
                     activeTab === tab.id 
                       ? 'bg-white/20 text-white' 
                       : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -54,7 +56,7 @@ const Navigation = ({ tabs, activeTab, onTabChange }) => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden sm:inline text-sm">{tab.label}</span>
                   
                   {activeTab === tab.id && (
                     <motion.div

@@ -9,13 +9,24 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-const CategoryChart = ({ transactions }) => {
-  const expenseTransactions = transactions.filter(t => t.type === 'expense')
+const CategoryChart = ({ transactions = [] }) => {
+  console.log('CategoryChart received transactions:', transactions.length)
+  
+  // Filter expense transactions and ensure we have valid data
+  const expenseTransactions = transactions.filter(t => 
+    t && t.type === 'expense' && t.amount && t.category
+  )
+  
+  console.log('Filtered expense transactions:', expenseTransactions.length)
   
   const categoryTotals = expenseTransactions.reduce((acc, transaction) => {
-    acc[transaction.category] = (acc[transaction.category] || 0) + transaction.amount
+    const category = transaction.category || 'Other'
+    const amount = parseFloat(transaction.amount) || 0
+    acc[category] = (acc[category] || 0) + amount
     return acc
   }, {})
+
+  console.log('Category totals:', categoryTotals)
 
   const categories = Object.keys(categoryTotals)
   const amounts = Object.values(categoryTotals)
@@ -87,8 +98,16 @@ const CategoryChart = ({ transactions }) => {
 
   if (categories.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-white/50">
-        <p>No expense data available</p>
+      <div className="h-64 flex flex-col items-center justify-center text-white/50 space-y-4">
+        <div className="text-6xl">📊</div>
+        <div className="text-center">
+          <p className="text-lg font-medium">No expense data available</p>
+          <p className="text-sm">Add some expense transactions to see the breakdown</p>
+          <p className="text-xs mt-2 text-white/30">
+            Total transactions: {transactions.length} | 
+            Expense transactions: {expenseTransactions.length}
+          </p>
+        </div>
       </div>
     )
   }

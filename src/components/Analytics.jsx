@@ -35,9 +35,11 @@ ChartJS.register(
   ArcElement
 )
 
-const Analytics = ({ transactions }) => {
+const Analytics = ({ transactions = [] }) => {
   const [timeRange, setTimeRange] = useState('6months')
   const [chartType, setChartType] = useState('line')
+
+  console.log('Analytics received transactions:', transactions.length)
 
   // Generate monthly data for the selected time range
   const getMonthlyData = () => {
@@ -51,17 +53,23 @@ const Analytics = ({ transactions }) => {
       const monthStart = startOfMonth(month)
       const monthEnd = endOfMonth(month)
       
-      const monthTransactions = transactions.filter(transaction =>
-        isWithinInterval(new Date(transaction.date), { start: monthStart, end: monthEnd })
-      )
+      const monthTransactions = transactions.filter(transaction => {
+        if (!transaction || !transaction.date) return false
+        try {
+          return isWithinInterval(new Date(transaction.date), { start: monthStart, end: monthEnd })
+        } catch (error) {
+          console.error('Error filtering transaction by date:', transaction, error)
+          return false
+        }
+      })
       
       const income = monthTransactions
-        .filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0)
+        .filter(t => t && t.type === 'income' && t.amount)
+        .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
       
       const expenses = monthTransactions
-        .filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0)
+        .filter(t => t && t.type === 'expense' && t.amount)
+        .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
       
       return {
         month: format(month, 'MMM yyyy'),
@@ -174,9 +182,11 @@ const Analytics = ({ transactions }) => {
 
   // Category analysis
   const categoryData = transactions
-    .filter(t => t.type === 'expense')
+    .filter(t => t && t.type === 'expense' && t.category && t.amount)
     .reduce((acc, transaction) => {
-      acc[transaction.category] = (acc[transaction.category] || 0) + transaction.amount
+      const category = transaction.category || 'Other'
+      const amount = parseFloat(transaction.amount) || 0
+      acc[category] = (acc[category] || 0) + amount
       return acc
     }, {})
 
@@ -211,10 +221,16 @@ const Analytics = ({ transactions }) => {
   }
 
   // Financial insights
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
-  const avgMonthlyIncome = monthlyData.reduce((sum, d) => sum + d.income, 0) / monthlyData.length
-  const avgMonthlyExpenses = monthlyData.reduce((sum, d) => sum + d.expenses, 0) / monthlyData.length
+  const totalIncome = transactions
+    .filter(t => t && t.type === 'income' && t.amount)
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
+  
+  const totalExpenses = transactions
+    .filter(t => t && t.type === 'expense' && t.amount)
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
+  
+  const avgMonthlyIncome = monthlyData.length > 0 ? monthlyData.reduce((sum, d) => sum + d.income, 0) / monthlyData.length : 0
+  const avgMonthlyExpenses = monthlyData.length > 0 ? monthlyData.reduce((sum, d) => sum + d.expenses, 0) / monthlyData.length : 0
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome * 100) : 0
 
   const insights = [
@@ -260,6 +276,9 @@ const Analytics = ({ transactions }) => {
       >
         <h2 className="text-3xl font-bold gradient-text mb-2">Financial Analytics</h2>
         <p className="text-white/70">Deep insights into your spending patterns and financial health</p>
+        <p className="text-xs text-white/50 mt-1">
+          Analyzing {transactions.length} transactions
+        </p>
       </motion.div>
 
       {/* Controls */}
@@ -386,26 +405,36 @@ const Analytics = ({ transactions }) => {
           <h3 className="text-xl font-semibold">Expense Categories Analysis</h3>
         </div>
         <div className="h-80">
-          <Doughnut 
-            data={categoryChartData} 
-            options={{
-              ...chartOptions,
-              cutout: '60%',
-              plugins: {
-                ...chartOptions.plugins,
-                tooltip: {
-                  ...chartOptions.plugins.tooltip,
-                  callbacks: {
-                    label: function(context) {
-                      const total = context.dataset.data.reduce((a, b) => a + b, 0)
-                      const percentage = ((context.parsed / total) * 100).toFixed(1)
-                      return `${context.label}: $${context.parsed.toFixed(2)} (${percentage}%)`
+          {Object.keys(categoryData).length > 0 ? (
+            <Doughnut 
+              data={categoryChartData} 
+              options={{
+                ...chartOptions,
+                cutout: '60%',
+                plugins: {
+                  ...chartOptions.plugins,
+                  tooltip: {
+                    ...chartOptions.plugins.tooltip,
+                    callbacks: {
+                      label: function(context) {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0)
+                        const percentage = ((context.parsed / total) * 100).toFixed(1)
+                        return `${context.label}: $${context.parsed.toFixed(2)} (${percentage}%)`
+                      }
                     }
                   }
                 }
-              }
-            }} 
-          />
+              }} 
+            />
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-white/50 space-y-4">
+              <div className="text-6xl">📊</div>
+              <div className="text-center">
+                <p className="text-lg font-medium">No expense data available</p>
+                <p className="text-sm">Add some expense transactions to see the breakdown</p>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

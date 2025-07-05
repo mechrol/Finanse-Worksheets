@@ -6,12 +6,16 @@ import TransactionForm from './components/TransactionForm'
 import Analytics from './components/Analytics'
 import TransactionList from './components/TransactionList'
 import Worksheets from './components/Worksheets'
-import Checklists from './components/Checklists'
+import ChecklistTab from './components/ChecklistTab'
+import FarmLedger from './components/FarmLedger'
 import Navigation from './components/Navigation'
+import Sidebar from './components/Sidebar'
+import MenuToggle from './components/MenuToggle'
 import { useExpenseData } from './hooks/useExpenseData'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const { transactions, addTransaction, deleteTransaction, updateTransaction, loading } = useExpenseData()
 
   const tabs = [
@@ -19,9 +23,35 @@ function App() {
     { id: 'transactions', label: 'Transactions', icon: 'Receipt' },
     { id: 'worksheets', label: 'Worksheets', icon: 'FileSpreadsheet' },
     { id: 'checklists', label: 'Checklists', icon: 'CheckSquare' },
+    { id: 'farm', label: 'Farm Ledger', icon: 'Tractor' },
     { id: 'analytics', label: 'Analytics', icon: 'TrendingUp' },
     { id: 'add', label: 'Add Expense', icon: 'Plus' }
   ]
+
+  // Close sidebar when clicking outside on desktop
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarOpen && window.innerWidth >= 1024) {
+        const sidebar = document.querySelector('[data-sidebar]')
+        const toggle = document.querySelector('[data-menu-toggle]')
+        
+        if (sidebar && !sidebar.contains(event.target) && 
+            toggle && !toggle.contains(event.target)) {
+          setSidebarOpen(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [sidebarOpen])
+
+  // Close sidebar on route change for mobile
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false)
+    }
+  }, [activeTab])
 
   const renderContent = () => {
     switch (activeTab) {
@@ -36,7 +66,9 @@ function App() {
       case 'worksheets':
         return <Worksheets transactions={transactions} />
       case 'checklists':
-        return <Checklists />
+        return <ChecklistTab />
+      case 'farm':
+        return <FarmLedger />
       case 'analytics':
         return <Analytics transactions={transactions} />
       case 'add':
@@ -93,13 +125,37 @@ function App() {
       </div>
 
       <div className="relative z-10">
-        <Navigation 
-          tabs={tabs} 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+        {/* Mobile Menu Toggle */}
+        <MenuToggle 
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          showFarmIndicator={activeTab === 'farm'}
         />
+
+        {/* Sidebar */}
+        <div data-sidebar>
+          <Sidebar 
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            isOpen={sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+          />
+        </div>
+
+        {/* Top Navigation - Hidden on mobile when sidebar is available */}
+        <div className="lg:block">
+          <Navigation 
+            tabs={tabs} 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+          />
+        </div>
         
-        <main className="container mx-auto px-4 py-8">
+        {/* Main Content */}
+        <main className={`container mx-auto px-4 py-8 transition-all duration-300 ${
+          sidebarOpen && window.innerWidth >= 1024 ? 'lg:ml-72' : ''
+        }`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
