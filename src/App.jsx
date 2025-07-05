@@ -11,12 +11,16 @@ import FarmLedger from './components/FarmLedger'
 import Navigation from './components/Navigation'
 import Sidebar from './components/Sidebar'
 import MenuToggle from './components/MenuToggle'
+import AuthPage from './components/AuthPage'
 import { useExpenseData } from './hooks/useExpenseData'
+import { useAuth } from './hooks/useAuth'
+import { LogOut, User } from 'lucide-react'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { transactions, addTransaction, deleteTransaction, updateTransaction, loading } = useExpenseData()
+  const { user, loading: authLoading, signOut } = useAuth()
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
@@ -76,6 +80,28 @@ function App() {
       default:
         return <Dashboard transactions={transactions} />
     }
+  }
+
+  // Show loading screen while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="glass-card p-8 text-center">
+          <motion.div 
+            className="rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+            style={{ borderColor: '#7F00FF' }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+          <p className="text-white/70">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show auth page if user is not authenticated
+  if (!user) {
+    return <AuthPage />
   }
 
   return (
@@ -148,7 +174,9 @@ function App() {
           <Navigation 
             tabs={tabs} 
             activeTab={activeTab} 
-            onTabChange={setActiveTab} 
+            onTabChange={setActiveTab}
+            user={user}
+            onSignOut={signOut}
           />
         </div>
         

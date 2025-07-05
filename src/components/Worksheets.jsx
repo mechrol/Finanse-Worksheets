@@ -19,7 +19,6 @@ import ConsolidatingDebtWorksheet from './ConsolidatingDebtWorksheet'
 import DocumentProcessor from './DocumentProcessor'
 import ImportedWorksheet from './ImportedWorksheet'
 import { saveAs } from 'file-saver'
-import { Document, Packer, Paragraph, TextRun } from 'docx'
 import toast from 'react-hot-toast'
 
 const Worksheets = ({ transactions }) => {
@@ -130,6 +129,9 @@ const Worksheets = ({ transactions }) => {
 
   const handleExportAll = async () => {
     try {
+      // Dynamic import for docx to avoid build issues
+      const { Document, Packer, Paragraph, TextRun } = await import('docx')
+      
       const doc = new Document({
         sections: [{
           properties: {},

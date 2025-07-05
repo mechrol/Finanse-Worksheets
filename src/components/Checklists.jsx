@@ -16,12 +16,10 @@ import {
   Award,
   Clock,
   Users,
-  Zap,
-  FileText
+  Zap
 } from 'lucide-react'
 import ChecklistForm from './ChecklistForm'
 import ChecklistImporter from './ChecklistImporter'
-import { exportChecklistToPDF, exportAllChecklistsToPDF } from '../utils/pdfExport'
 import toast from 'react-hot-toast'
 
 const Checklists = () => {
@@ -30,7 +28,6 @@ const Checklists = () => {
   const [activeChecklist, setActiveChecklist] = useState(null)
   const [showImporter, setShowImporter] = useState(false)
   const [importedChecklists, setImportedChecklists] = useState([])
-  const [checklistAnswers, setChecklistAnswers] = useState({})
 
   // Sample checklists with different categories
   const sampleChecklists = [
@@ -192,30 +189,11 @@ const Checklists = () => {
     toast.success('New checklist imported successfully!')
   }
 
-  const handleExportSingle = (checklist) => {
-    const answers = checklistAnswers[checklist.id] || {}
-    exportChecklistToPDF(checklist, answers)
-    toast.success(`Exported "${checklist.title}" to PDF`)
-  }
-
-  const handleExportAll = () => {
-    exportAllChecklistsToPDF(sampleChecklists, checklistAnswers)
-    toast.success('Exported all checklists to PDF')
-  }
-
-  const handleAnswersUpdate = (checklistId, answers) => {
-    setChecklistAnswers(prev => ({
-      ...prev,
-      [checklistId]: answers
-    }))
-  }
-
   if (activeChecklist) {
     return (
       <ChecklistForm 
         checklist={activeChecklist} 
-        onBack={() => setActiveChecklist(null)}
-        onAnswersUpdate={(answers) => handleAnswersUpdate(activeChecklist.id, answers)}
+        onBack={() => setActiveChecklist(null)} 
       />
     )
   }
@@ -243,16 +221,6 @@ const Checklists = () => {
             >
               <Upload className="h-4 w-4" />
               <span>Import Checklist</span>
-            </motion.button>
-            
-            <motion.button
-              onClick={handleExportAll}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="glass-button flex items-center space-x-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30"
-            >
-              <FileText className="h-4 w-4" />
-              <span>Export All to PDF</span>
             </motion.button>
             
             <motion.button
@@ -309,9 +277,7 @@ const Checklists = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredChecklists.map((checklist, index) => {
           const Icon = checklist.icon || CheckSquare
-          const answers = checklistAnswers[checklist.id] || {}
-          const completedItems = Object.keys(answers).length
-          const completionRate = checklist.totalItems > 0 ? (completedItems / checklist.totalItems * 100) : 0
+          const completionRate = checklist.totalItems > 0 ? (checklist.completedItems / checklist.totalItems * 100) : 0
           
           return (
             <motion.div
@@ -339,24 +305,9 @@ const Checklists = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-end space-y-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(checklist.status)}`}>
-                    {checklist.status}
-                  </span>
-                  
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleExportSingle(checklist)
-                    }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
-                    title="Export to PDF"
-                  >
-                    <FileText className="h-3 w-3" />
-                  </motion.button>
-                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(checklist.status)}`}>
+                  {checklist.status}
+                </span>
               </div>
               
               <p className="text-sm text-white/70 mb-4 line-clamp-2">{checklist.description}</p>
@@ -364,7 +315,7 @@ const Checklists = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/60">Progress</span>
-                  <span className="text-white font-medium">{completedItems}/{checklist.totalItems}</span>
+                  <span className="text-white font-medium">{checklist.completedItems}/{checklist.totalItems}</span>
                 </div>
                 
                 <div className="w-full bg-white/10 rounded-full h-2">
@@ -424,7 +375,7 @@ const Checklists = () => {
           
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-400">
-              {Object.values(checklistAnswers).reduce((sum, answers) => sum + Object.keys(answers).length, 0)}
+              {sampleChecklists.reduce((sum, c) => sum + c.completedItems, 0)}
             </div>
             <div className="text-sm text-white/60">Completed</div>
           </div>
