@@ -47,12 +47,49 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Background Elements */}
+    <div className="min-h-screen">
+      {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
+        <motion.div 
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          style={{ background: 'radial-gradient(circle, #7F00FF 0%, transparent 70%)' }}
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        <motion.div 
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-xl opacity-25"
+          style={{ background: 'radial-gradient(circle, #B347D9 0%, transparent 70%)' }}
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-xl opacity-20"
+          style={{ background: 'radial-gradient(circle, #E0AAFF 0%, transparent 70%)' }}
+          animate={{
+            scale: [1, 1.3, 1],
+            x: [-50, 50, -50],
+            y: [-30, 30, -30],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
       </div>
 
       <div className="relative z-10">
@@ -74,7 +111,13 @@ function App() {
               {loading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="glass-card">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
+                    <motion.div 
+                      className="rounded-full h-12 w-12 border-b-2 mx-auto"
+                      style={{ borderColor: '#7F00FF' }}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                    <p className="text-center mt-4 text-white/70">Loading...</p>
                   </div>
                 </div>
               ) : (
@@ -89,10 +132,11 @@ function App() {
         position="top-right"
         toastOptions={{
           style: {
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: 'rgba(127, 0, 255, 0.15)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(127, 0, 255, 0.3)',
             color: 'white',
+            boxShadow: '0 8px 32px rgba(127, 0, 255, 0.2)',
           },
         }}
       />
