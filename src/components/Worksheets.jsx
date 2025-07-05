@@ -11,9 +11,11 @@ import {
   Filter,
   Search,
   Calculator,
-  Target
+  Target,
+  CreditCard
 } from 'lucide-react'
 import PaycheckCycleWorksheet from './PaycheckCycleWorksheet'
+import ConsolidatingDebtWorksheet from './ConsolidatingDebtWorksheet'
 import DocumentProcessor from './DocumentProcessor'
 import ImportedWorksheet from './ImportedWorksheet'
 import { saveAs } from 'file-saver'
@@ -28,7 +30,7 @@ const Worksheets = ({ transactions }) => {
   const [showDocumentProcessor, setShowDocumentProcessor] = useState(false)
   const [importedWorksheets, setImportedWorksheets] = useState([])
 
-  // Sample worksheet data with the new paycheck cycle worksheet
+  // Sample worksheet data with the new debt consolidation worksheet
   const worksheets = [
     {
       id: 1,
@@ -44,6 +46,18 @@ const Worksheets = ({ transactions }) => {
     },
     {
       id: 2,
+      name: 'Consolidating Debt Worksheet',
+      type: 'Debt Management',
+      lastModified: '2024-01-16',
+      entries: 0,
+      totalAmount: 0,
+      status: 'interactive',
+      description: 'Comprehensive debt consolidation planning tool with 8-week progress tracking and calculation features',
+      icon: CreditCard,
+      isInteractive: true
+    },
+    {
+      id: 3,
       name: 'Monthly Budget Analysis',
       type: 'Budget',
       lastModified: '2024-01-15',
@@ -53,7 +67,7 @@ const Worksheets = ({ transactions }) => {
       icon: Target
     },
     {
-      id: 3,
+      id: 4,
       name: 'Q1 Expense Report',
       type: 'Report',
       lastModified: '2024-01-12',
@@ -63,7 +77,7 @@ const Worksheets = ({ transactions }) => {
       icon: FileSpreadsheet
     },
     {
-      id: 4,
+      id: 5,
       name: 'Travel Expenses - January',
       type: 'Travel',
       lastModified: '2024-01-10',
@@ -73,7 +87,7 @@ const Worksheets = ({ transactions }) => {
       icon: FileSpreadsheet
     },
     {
-      id: 5,
+      id: 6,
       name: 'Office Supplies Tracking',
       type: 'Supplies',
       lastModified: '2024-01-08',
@@ -206,6 +220,8 @@ const Worksheets = ({ transactions }) => {
   if (activeWorksheet) {
     if (activeWorksheet.id === 1) {
       return <PaycheckCycleWorksheet onBack={() => setActiveWorksheet(null)} />
+    } else if (activeWorksheet.id === 2) {
+      return <ConsolidatingDebtWorksheet onBack={() => setActiveWorksheet(null)} />
     } else if (activeWorksheet.sections) {
       return (
         <ImportedWorksheet 
@@ -293,6 +309,7 @@ const Worksheets = ({ transactions }) => {
             >
               <option value="all">All Types</option>
               <option value="financial planning">Financial Planning</option>
+              <option value="debt management">Debt Management</option>
               <option value="budget">Budget</option>
               <option value="report">Report</option>
               <option value="travel">Travel</option>
@@ -380,7 +397,7 @@ const Worksheets = ({ transactions }) => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-center py-4">
                     <div className="text-center">
-                      <Calculator className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                      <Icon className="h-8 w-8 text-purple-400 mx-auto mb-2" />
                       <p className="text-sm text-white/80">Interactive Worksheet</p>
                       <p className="text-xs text-white/60">Click to start your financial planning journey</p>
                     </div>
