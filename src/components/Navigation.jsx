@@ -15,9 +15,6 @@ import {
   Menu,
   MoreHorizontal
 } from 'lucide-react'
-import { useLanguage } from '../contexts/LanguageContext'
-import { useTranslation } from '../utils/translations'
-import LanguageToggle from './LanguageToggle'
 
 const iconMap = {
   LayoutDashboard,
@@ -33,8 +30,6 @@ const iconMap = {
 const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [featuresMenuOpen, setFeaturesMenuOpen] = useState(false)
-  const { language } = useLanguage()
-  const { t } = useTranslation(language)
 
   // Core dashboard tabs that are always visible
   const coreTabs = tabs.filter(tab => 
@@ -45,20 +40,6 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
   const additionalFeatures = tabs.filter(tab => 
     !['dashboard', 'add', 'transactions'].includes(tab.id)
   )
-
-  const getTabLabel = (tabId) => {
-    return t(`navigation.${tabId}`)
-  }
-
-  const getFeatureDescription = (featureId) => {
-    const descriptions = {
-      analytics: language === 'pl' ? 'Raporty i analizy' : 'Reports & Insights',
-      worksheets: language === 'pl' ? 'Planowanie finansowe' : 'Financial Planning',
-      checklists: language === 'pl' ? 'Zarządzanie zadaniami' : 'Task Management',
-      farm: language === 'pl' ? 'Wydatki rolnicze' : 'Agricultural Expenses'
-    }
-    return descriptions[featureId] || ''
-  }
 
   return (
     <nav className="glass border-b border-white/10 sticky top-0 z-50">
@@ -71,7 +52,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
             transition={{ duration: 0.5 }}
           >
             <Wallet className="h-8 w-8 text-blue-400" />
-            <h1 className="text-xl font-bold gradient-text">{t('appName')}</h1>
+            <h1 className="text-xl font-bold gradient-text">SpendTracker</h1>
           </motion.div>
 
           <div className="flex items-center space-x-4">
@@ -95,7 +76,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline text-sm font-medium">{getTabLabel(tab.id)}</span>
+                    <span className="hidden sm:inline text-sm font-medium">{tab.label}</span>
                     
                     {activeTab === tab.id && (
                       <motion.div
@@ -119,7 +100,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <MoreHorizontal className="h-4 w-4 text-white/70" />
-                  <span className="hidden md:inline text-sm text-white/70">{t('navigation.more')}</span>
+                  <span className="hidden md:inline text-sm text-white/70">More</span>
                   <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${
                     featuresMenuOpen ? 'rotate-180' : ''
                   }`} />
@@ -136,7 +117,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                     >
                       <div className="px-3 py-2 border-b border-white/10">
                         <p className="text-xs font-medium text-white/50 uppercase tracking-wider">
-                          {t('navigation.additionalFeatures')}
+                          Additional Features
                         </p>
                       </div>
                       
@@ -155,9 +136,12 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                           >
                             <Icon className="h-4 w-4" />
                             <div>
-                              <div className="font-medium">{getTabLabel(feature.id)}</div>
+                              <div className="font-medium">{feature.label}</div>
                               <div className="text-xs text-white/50">
-                                {getFeatureDescription(feature.id)}
+                                {feature.id === 'analytics' && 'Reports & Insights'}
+                                {feature.id === 'worksheets' && 'Financial Planning'}
+                                {feature.id === 'checklists' && 'Task Management'}
+                                {feature.id === 'farm' && 'Agricultural Expenses'}
                               </div>
                             </div>
                           </button>
@@ -168,9 +152,6 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                 </AnimatePresence>
               </div>
             )}
-
-            {/* Language Toggle */}
-            <LanguageToggle />
 
             {/* User Menu */}
             <div className="relative">
@@ -184,7 +165,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                   <User className="h-4 w-4 text-white" />
                 </div>
                 <span className="hidden md:inline text-sm text-white">
-                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || t('ui.user')}
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${
                   userMenuOpen ? 'rotate-180' : ''
@@ -202,7 +183,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                   >
                     <div className="px-4 py-2 border-b border-white/10">
                       <p className="text-sm font-medium text-white">
-                        {user?.user_metadata?.full_name || t('ui.user')}
+                        {user?.user_metadata?.full_name || 'User'}
                       </p>
                       <p className="text-xs text-white/60">{user?.email}</p>
                     </div>
@@ -215,7 +196,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                       className="w-full px-4 py-2 text-left text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center space-x-2"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>{t('auth.signOut')}</span>
+                      <span>Sign Out</span>
                     </button>
                   </motion.div>
                 )}

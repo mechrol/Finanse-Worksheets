@@ -10,16 +10,9 @@ import {
   ArrowDownLeft
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns'
-import { pl, enUS } from 'date-fns/locale'
-import { useLanguage } from '../contexts/LanguageContext'
-import { useTranslation } from '../utils/translations'
 import AffiliateBanner from './AffiliateBanner'
 
 const Dashboard = ({ transactions = [] }) => {
-  const { language } = useLanguage()
-  const { t } = useTranslation(language)
-  const locale = language === 'pl' ? pl : enUS
-  
   const currentMonth = new Date()
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(currentMonth)
@@ -81,19 +74,12 @@ const Dashboard = ({ transactions = [] }) => {
   }
 
   const formatCurrency = (amount) => {
-    const currency = language === 'pl' ? 'PLN' : 'USD'
-    const locale = language === 'pl' ? 'pl-PL' : 'en-US'
-    
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(Math.abs(amount))
-  }
-
-  const translateCategory = (category) => {
-    return t(`categories.${category}`) || category
   }
 
   return (
@@ -105,10 +91,10 @@ const Dashboard = ({ transactions = [] }) => {
         transition={{ duration: 0.5 }}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl font-bold text-white mb-2">{t('dashboard.title')}</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Spending Overview</h2>
         <p className="text-white/60 flex items-center justify-center space-x-2">
           <Calendar className="h-4 w-4" />
-          <span>{format(currentMonth, 'LLLL yyyy', { locale })}</span>
+          <span>{format(currentMonth, 'MMMM yyyy')}</span>
         </p>
       </motion.div>
 
@@ -124,7 +110,7 @@ const Dashboard = ({ transactions = [] }) => {
           <div className="p-2 rounded-full bg-red-500/20 w-fit mx-auto mb-3">
             <TrendingDown className="h-6 w-6 text-red-400" />
           </div>
-          <h3 className="text-sm text-white/70 mb-1">{t('dashboard.totalSpent')}</h3>
+          <h3 className="text-sm text-white/70 mb-1">Total Spent</h3>
           <p className="text-2xl font-bold text-red-400">{formatCurrency(totalExpenses)}</p>
         </motion.div>
 
@@ -138,7 +124,7 @@ const Dashboard = ({ transactions = [] }) => {
           <div className="p-2 rounded-full bg-green-500/20 w-fit mx-auto mb-3">
             <DollarSign className="h-6 w-6 text-green-400" />
           </div>
-          <h3 className="text-sm text-white/70 mb-1">{t('dashboard.income')}</h3>
+          <h3 className="text-sm text-white/70 mb-1">Income</h3>
           <p className="text-2xl font-bold text-green-400">{formatCurrency(totalIncome)}</p>
         </motion.div>
 
@@ -156,7 +142,7 @@ const Dashboard = ({ transactions = [] }) => {
               balance >= 0 ? 'text-blue-400' : 'text-orange-400'
             }`} />
           </div>
-          <h3 className="text-sm text-white/70 mb-1">{t('dashboard.remaining')}</h3>
+          <h3 className="text-sm text-white/70 mb-1">Remaining</h3>
           <p className={`text-2xl font-bold ${
             balance >= 0 ? 'text-blue-400' : 'text-orange-400'
           }`}>
@@ -189,12 +175,12 @@ const Dashboard = ({ transactions = [] }) => {
         >
           <div className="flex items-center space-x-2 mb-6">
             <PieChart className="h-5 w-5 text-purple-400" />
-            <h3 className="text-lg font-semibold text-white">{t('dashboard.topSpendingCategories')}</h3>
+            <h3 className="text-lg font-semibold text-white">Top Spending Categories</h3>
           </div>
 
           {topCategories.length === 0 ? (
             <div className="text-center py-8 text-white/50">
-              <p>{t('dashboard.noExpenses')}</p>
+              <p>No expenses this month</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -205,7 +191,7 @@ const Dashboard = ({ transactions = [] }) => {
                     <div className="text-2xl">{getCategoryIcon(category)}</div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-white font-medium">{translateCategory(category)}</span>
+                        <span className="text-white font-medium">{category}</span>
                         <span className="text-white/70">{formatCurrency(amount)}</span>
                       </div>
                       <div className="w-full bg-white/10 rounded-full h-2">
@@ -217,7 +203,7 @@ const Dashboard = ({ transactions = [] }) => {
                         />
                       </div>
                       <div className="text-xs text-white/50 mt-1">
-                        {percentage.toFixed(1)}% {language === 'pl' ? 'całkowitych wydatków' : 'of total spending'}
+                        {percentage.toFixed(1)}% of total spending
                       </div>
                     </div>
                   </div>
@@ -236,12 +222,12 @@ const Dashboard = ({ transactions = [] }) => {
         >
           <div className="flex items-center space-x-2 mb-6">
             <Receipt className="h-5 w-5 text-green-400" />
-            <h3 className="text-lg font-semibold text-white">{t('dashboard.recentTransactions')}</h3>
+            <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
           </div>
 
           {recentTransactions.length === 0 ? (
             <div className="text-center py-8 text-white/50">
-              <p>{t('dashboard.noTransactions')}</p>
+              <p>No transactions yet</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -262,7 +248,7 @@ const Dashboard = ({ transactions = [] }) => {
                         {transaction.description}
                       </h4>
                       <p className="text-xs text-white/60">
-                        {format(new Date(transaction.date), 'MMM dd', { locale })} • {translateCategory(transaction.category)}
+                        {format(new Date(transaction.date), 'MMM dd')} • {transaction.category}
                       </p>
                     </div>
                   </div>
@@ -300,15 +286,15 @@ const Dashboard = ({ transactions = [] }) => {
         transition={{ duration: 0.5, delay: 0.8 }}
         className="glass-card"
       >
-        <h3 className="text-lg font-semibold text-white mb-4">💡 {t('dashboard.spendingInsights')}</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">💡 Spending Insights</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {totalExpenses > 0 && (
             <>
               <div className="p-4 bg-white/5 rounded-lg">
-                <h4 className="text-sm font-medium text-purple-400 mb-1">{t('dashboard.insights.topCategory')}</h4>
+                <h4 className="text-sm font-medium text-purple-400 mb-1">Top Category</h4>
                 <p className="text-white">
-                  {topCategories[0] ? translateCategory(topCategories[0][0]) : t('dashboard.insights.noData')}
+                  {topCategories[0] ? topCategories[0][0] : 'No data'}
                 </p>
                 <p className="text-xs text-white/60">
                   {topCategories[0] ? formatCurrency(topCategories[0][1]) : ''}
@@ -316,19 +302,19 @@ const Dashboard = ({ transactions = [] }) => {
               </div>
 
               <div className="p-4 bg-white/5 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-400 mb-1">{t('dashboard.insights.dailyAverage')}</h4>
+                <h4 className="text-sm font-medium text-blue-400 mb-1">Daily Average</h4>
                 <p className="text-white">
                   {formatCurrency(totalExpenses / new Date().getDate())}
                 </p>
-                <p className="text-xs text-white/60">{t('dashboard.insights.thisMonth')}</p>
+                <p className="text-xs text-white/60">This month</p>
               </div>
 
               <div className="p-4 bg-white/5 rounded-lg">
-                <h4 className="text-sm font-medium text-green-400 mb-1">{t('dashboard.insights.savingsRate')}</h4>
+                <h4 className="text-sm font-medium text-green-400 mb-1">Savings Rate</h4>
                 <p className="text-white">
                   {totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : '0'}%
                 </p>
-                <p className="text-xs text-white/60">{t('dashboard.insights.ofIncomeSaved')}</p>
+                <p className="text-xs text-white/60">Of income saved</p>
               </div>
             </>
           )}
@@ -336,7 +322,7 @@ const Dashboard = ({ transactions = [] }) => {
 
         {totalExpenses === 0 && (
           <div className="text-center py-8 text-white/50">
-            <p>{t('dashboard.addTransactionsPrompt')}</p>
+            <p>Add some transactions to see your spending insights</p>
           </div>
         )}
       </motion.div>

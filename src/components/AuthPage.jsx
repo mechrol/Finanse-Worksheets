@@ -12,10 +12,7 @@ import {
   Zap,
   TrendingUp
 } from 'lucide-react'
-import { useLanguage } from '../contexts/LanguageContext'
-import { useTranslation } from '../utils/translations'
 import { useAuth } from '../hooks/useAuth'
-import LanguageToggle from './LanguageToggle'
 
 const AuthPage = () => {
   const [mode, setMode] = useState('login') // 'login', 'register', 'reset'
@@ -27,8 +24,6 @@ const AuthPage = () => {
     confirmPassword: ''
   })
 
-  const { language } = useLanguage()
-  const { t } = useTranslation(language)
   const { signIn, signUp, resetPassword, loading } = useAuth()
 
   const handleInputChange = (field, value) => {
@@ -45,7 +40,7 @@ const AuthPage = () => {
       await signIn(formData.email, formData.password)
     } else if (mode === 'register') {
       if (formData.password !== formData.confirmPassword) {
-        toast.error(language === 'pl' ? 'Hasła nie pasują do siebie' : 'Passwords do not match')
+        toast.error('Passwords do not match')
         return
       }
       await signUp(formData.email, formData.password, formData.fullName)
@@ -57,28 +52,23 @@ const AuthPage = () => {
   const features = [
     {
       icon: TrendingUp,
-      title: t('auth.features.smartAnalytics.title'),
-      description: t('auth.features.smartAnalytics.description')
+      title: 'Smart Analytics',
+      description: 'Track spending patterns with intelligent insights'
     },
     {
       icon: Shield,
-      title: t('auth.features.securePrivate.title'),
-      description: t('auth.features.securePrivate.description')
+      title: 'Secure & Private',
+      description: 'Bank-level security for your financial data'
     },
     {
       icon: Zap,
-      title: t('auth.features.realtimeSync.title'),
-      description: t('auth.features.realtimeSync.description')
+      title: 'Real-time Sync',
+      description: 'Access your data anywhere, anytime'
     }
   ]
 
   return (
     <div className="min-h-screen flex">
-      {/* Language Toggle - Fixed Position */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageToggle />
-      </div>
-
       {/* Left Side - Features */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 to-indigo-900/90" />
@@ -117,16 +107,16 @@ const AuthPage = () => {
           >
             <div className="flex items-center space-x-3 mb-8">
               <Wallet className="h-10 w-10 text-purple-400" />
-              <h1 className="text-3xl font-bold gradient-text">{t('appName')}</h1>
+              <h1 className="text-3xl font-bold gradient-text">ExpenseTracker Pro</h1>
             </div>
             
             <h2 className="text-4xl font-bold mb-6 leading-tight">
-              {t('auth.tagline')}
-              <span className="block gradient-text">{t('auth.taglineHighlight')}</span>
+              Take Control of Your
+              <span className="block gradient-text">Financial Future</span>
             </h2>
             
             <p className="text-xl text-white/80 mb-12 leading-relaxed">
-              {t('auth.description')}
+              Join thousands of users who have transformed their financial habits with our comprehensive expense tracking and budgeting platform.
             </p>
 
             <div className="space-y-6">
@@ -167,20 +157,20 @@ const AuthPage = () => {
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center justify-center space-x-2 mb-8">
               <Wallet className="h-8 w-8 text-purple-400" />
-              <h1 className="text-2xl font-bold gradient-text">{t('appName')}</h1>
+              <h1 className="text-2xl font-bold gradient-text">ExpenseTracker Pro</h1>
             </div>
 
             {/* Form Header */}
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-white mb-2">
-                {mode === 'login' && t('auth.welcomeBack')}
-                {mode === 'register' && t('auth.createAccount')}
-                {mode === 'reset' && t('auth.resetPassword')}
+                {mode === 'login' && 'Welcome Back'}
+                {mode === 'register' && 'Create Account'}
+                {mode === 'reset' && 'Reset Password'}
               </h2>
               <p className="text-white/60">
-                {mode === 'login' && t('auth.signInSubtitle')}
-                {mode === 'register' && t('auth.registerSubtitle')}
-                {mode === 'reset' && t('auth.resetSubtitle')}
+                {mode === 'login' && 'Sign in to your account to continue'}
+                {mode === 'register' && 'Join us and start tracking your expenses'}
+                {mode === 'reset' && 'Enter your email to receive reset instructions'}
               </p>
             </div>
 
@@ -195,7 +185,7 @@ const AuthPage = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <label className="block text-sm font-medium text-white/80 mb-2">
-                      {t('auth.fullName')}
+                      Full Name
                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -204,7 +194,7 @@ const AuthPage = () => {
                         value={formData.fullName}
                         onChange={(e) => handleInputChange('fullName', e.target.value)}
                         className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                        placeholder={t('auth.fullNamePlaceholder')}
+                        placeholder="Enter your full name"
                         required={mode === 'register'}
                       />
                     </div>
@@ -214,7 +204,7 @@ const AuthPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-white/80 mb-2">
-                  {t('auth.email')}
+                  Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -223,7 +213,7 @@ const AuthPage = () => {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    placeholder={t('auth.emailPlaceholder')}
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
@@ -232,7 +222,7 @@ const AuthPage = () => {
               {mode !== 'reset' && (
                 <div>
                   <label className="block text-sm font-medium text-white/80 mb-2">
-                    {t('auth.password')}
+                    Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -241,7 +231,7 @@ const AuthPage = () => {
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
                       className="w-full pl-12 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      placeholder={t('auth.passwordPlaceholder')}
+                      placeholder="Enter your password"
                       required
                     />
                     <button
@@ -262,7 +252,7 @@ const AuthPage = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <label className="block text-sm font-medium text-white/80 mb-2">
-                    {t('auth.confirmPassword')}
+                    Confirm Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -271,7 +261,7 @@ const AuthPage = () => {
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                       className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      placeholder={t('auth.confirmPasswordPlaceholder')}
+                      placeholder="Confirm your password"
                       required
                     />
                   </div>
@@ -295,9 +285,9 @@ const AuthPage = () => {
                 ) : (
                   <>
                     <span>
-                      {mode === 'login' && t('auth.signIn')}
-                      {mode === 'register' && t('auth.signUp')}
-                      {mode === 'reset' && t('auth.sendResetEmail')}
+                      {mode === 'login' && 'Sign In'}
+                      {mode === 'register' && 'Create Account'}
+                      {mode === 'reset' && 'Send Reset Email'}
                     </span>
                     <ArrowRight className="h-5 w-5" />
                   </>
@@ -313,15 +303,15 @@ const AuthPage = () => {
                     onClick={() => setMode('reset')}
                     className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
                   >
-                    {t('auth.forgotPassword')}
+                    Forgot your password?
                   </button>
                   <div className="text-white/60 text-sm">
-                    {t('auth.noAccount')}{' '}
+                    Don't have an account?{' '}
                     <button
                       onClick={() => setMode('register')}
                       className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
                     >
-                      {t('auth.signUp')}
+                      Sign up
                     </button>
                   </div>
                 </>
@@ -329,24 +319,24 @@ const AuthPage = () => {
 
               {mode === 'register' && (
                 <div className="text-white/60 text-sm">
-                  {t('auth.hasAccount')}{' '}
+                  Already have an account?{' '}
                   <button
                     onClick={() => setMode('login')}
                     className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
                   >
-                    {t('auth.signIn')}
+                    Sign in
                   </button>
                 </div>
               )}
 
               {mode === 'reset' && (
                 <div className="text-white/60 text-sm">
-                  {t('auth.rememberPassword')}{' '}
+                  Remember your password?{' '}
                   <button
                     onClick={() => setMode('login')}
                     className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
                   >
-                    {t('auth.signIn')}
+                    Sign in
                   </button>
                 </div>
               )}
