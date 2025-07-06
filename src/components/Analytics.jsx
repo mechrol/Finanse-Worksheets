@@ -22,6 +22,7 @@ import {
   DollarSign
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, isWithinInterval } from 'date-fns'
+import AffiliateBanner from './AffiliateBanner'
 
 ChartJS.register(
   CategoryScale,
@@ -281,6 +282,19 @@ const Analytics = ({ transactions = [] }) => {
         </p>
       </motion.div>
 
+      {/* Top Affiliate Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <AffiliateBanner 
+          variant="warning" 
+          className="mb-6"
+          showCloseButton={true}
+        />
+      </motion.div>
+
       {/* Controls */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -391,6 +405,19 @@ const Analytics = ({ transactions = [] }) => {
             <Bar data={barChartData} options={chartOptions} />
           )}
         </div>
+      </motion.div>
+
+      {/* Middle Affiliate Banner */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.8 }}
+      >
+        <AffiliateBanner 
+          variant="minimal" 
+          className="my-8"
+          showCloseButton={true}
+        />
       </motion.div>
 
       {/* Category Breakdown */}

@@ -13,6 +13,7 @@ import BalanceCard from './BalanceCard'
 import CategoryChart from './CategoryChart'
 import RecentTransactions from './RecentTransactions'
 import BudgetProgress from './BudgetProgress'
+import AffiliateBanner from './AffiliateBanner'
 
 const Dashboard = ({ transactions = [] }) => {
   console.log('Dashboard received transactions:', transactions.length)
@@ -95,6 +96,19 @@ const Dashboard = ({ transactions = [] }) => {
         </p>
       </motion.div>
 
+      {/* Top Affiliate Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <AffiliateBanner 
+          variant="success" 
+          className="mb-6"
+          showCloseButton={true}
+        />
+      </motion.div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
@@ -136,6 +150,19 @@ const Dashboard = ({ transactions = [] }) => {
           <BudgetProgress transactions={currentMonthTransactions} />
         </motion.div>
       </div>
+
+      {/* Middle Affiliate Banner */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.8 }}
+      >
+        <AffiliateBanner 
+          variant="default" 
+          className="my-8"
+          showCloseButton={true}
+        />
+      </motion.div>
 
       {/* Recent Transactions */}
       <motion.div

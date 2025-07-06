@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Home
 } from 'lucide-react'
+import AffiliateBanner from './AffiliateBanner'
 
 const iconMap = {
   LayoutDashboard,
@@ -82,7 +83,7 @@ const Sidebar = ({ tabs, activeTab, onTabChange, isOpen, onToggle }) => {
         variants={sidebarVariants}
         className="fixed left-0 top-0 h-full w-72 z-50 lg:z-30"
       >
-        <div className="h-full glass-card rounded-none lg:rounded-r-2xl border-l-0">
+        <div className="h-full glass-card rounded-none lg:rounded-r-2xl border-l-0 flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
             <div className="flex items-center space-x-3">
@@ -183,6 +184,15 @@ const Sidebar = ({ tabs, activeTab, onTabChange, isOpen, onToggle }) => {
                   </motion.button>
                 )
               })}
+            </div>
+
+            {/* Sidebar Affiliate Banner */}
+            <div className="my-6">
+              <AffiliateBanner 
+                variant="minimal" 
+                showCloseButton={false}
+                className="text-xs"
+              />
             </div>
 
             {/* Farm Ledger Highlight */}
