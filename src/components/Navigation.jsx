@@ -11,8 +11,13 @@ import {
   Tractor,
   User,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Menu,
+  MoreHorizontal
 } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from '../utils/translations'
+import LanguageToggle from './LanguageToggle'
 
 const iconMap = {
   LayoutDashboard,
@@ -27,6 +32,33 @@ const iconMap = {
 
 const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [featuresMenuOpen, setFeaturesMenuOpen] = useState(false)
+  const { language } = useLanguage()
+  const { t } = useTranslation(language)
+
+  // Core dashboard tabs that are always visible
+  const coreTabs = tabs.filter(tab => 
+    ['dashboard', 'add', 'transactions'].includes(tab.id)
+  )
+
+  // Additional features for dropdown
+  const additionalFeatures = tabs.filter(tab => 
+    !['dashboard', 'add', 'transactions'].includes(tab.id)
+  )
+
+  const getTabLabel = (tabId) => {
+    return t(`navigation.${tabId}`)
+  }
+
+  const getFeatureDescription = (featureId) => {
+    const descriptions = {
+      analytics: language === 'pl' ? 'Raporty i analizy' : 'Reports & Insights',
+      worksheets: language === 'pl' ? 'Planowanie finansowe' : 'Financial Planning',
+      checklists: language === 'pl' ? 'Zarządzanie zadaniami' : 'Task Management',
+      farm: language === 'pl' ? 'Wydatki rolnicze' : 'Agricultural Expenses'
+    }
+    return descriptions[featureId] || ''
+  }
 
   return (
     <nav className="glass border-b border-white/10 sticky top-0 z-50">
@@ -39,19 +71,19 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
             transition={{ duration: 0.5 }}
           >
             <Wallet className="h-8 w-8 text-blue-400" />
-            <h1 className="text-xl font-bold gradient-text">ExpenseTracker Pro</h1>
+            <h1 className="text-xl font-bold gradient-text">{t('appName')}</h1>
           </motion.div>
 
           <div className="flex items-center space-x-4">
-            {/* Navigation Tabs */}
-            <div className="flex space-x-1 overflow-x-auto">
-              {tabs.map((tab, index) => {
+            {/* Core Navigation Tabs */}
+            <div className="flex space-x-1">
+              {coreTabs.map((tab, index) => {
                 const Icon = iconMap[tab.icon]
                 return (
                   <motion.button
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
-                    className={`relative px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 whitespace-nowrap ${
+                    className={`relative px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 ${
                       activeTab === tab.id 
                         ? 'bg-white/20 text-white' 
                         : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -63,7 +95,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline text-sm">{tab.label}</span>
+                    <span className="hidden sm:inline text-sm font-medium">{getTabLabel(tab.id)}</span>
                     
                     {activeTab === tab.id && (
                       <motion.div
@@ -77,6 +109,69 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
               })}
             </div>
 
+            {/* More Features Dropdown */}
+            {additionalFeatures.length > 0 && (
+              <div className="relative">
+                <motion.button
+                  onClick={() => setFeaturesMenuOpen(!featuresMenuOpen)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <MoreHorizontal className="h-4 w-4 text-white/70" />
+                  <span className="hidden md:inline text-sm text-white/70">{t('navigation.more')}</span>
+                  <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${
+                    featuresMenuOpen ? 'rotate-180' : ''
+                  }`} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {featuresMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-56 glass-card rounded-xl py-2 shadow-xl"
+                    >
+                      <div className="px-3 py-2 border-b border-white/10">
+                        <p className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                          {t('navigation.additionalFeatures')}
+                        </p>
+                      </div>
+                      
+                      {additionalFeatures.map((feature) => {
+                        const Icon = iconMap[feature.icon]
+                        return (
+                          <button
+                            key={feature.id}
+                            onClick={() => {
+                              onTabChange(feature.id)
+                              setFeaturesMenuOpen(false)
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-white/10 transition-colors flex items-center space-x-3 ${
+                              activeTab === feature.id ? 'bg-white/10 text-white' : 'text-white/80'
+                            }`}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <div>
+                              <div className="font-medium">{getTabLabel(feature.id)}</div>
+                              <div className="text-xs text-white/50">
+                                {getFeatureDescription(feature.id)}
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Language Toggle */}
+            <LanguageToggle />
+
             {/* User Menu */}
             <div className="relative">
               <motion.button
@@ -89,7 +184,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                   <User className="h-4 w-4 text-white" />
                 </div>
                 <span className="hidden md:inline text-sm text-white">
-                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || t('ui.user')}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${
                   userMenuOpen ? 'rotate-180' : ''
@@ -107,7 +202,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                   >
                     <div className="px-4 py-2 border-b border-white/10">
                       <p className="text-sm font-medium text-white">
-                        {user?.user_metadata?.full_name || 'User'}
+                        {user?.user_metadata?.full_name || t('ui.user')}
                       </p>
                       <p className="text-xs text-white/60">{user?.email}</p>
                     </div>
@@ -120,7 +215,7 @@ const Navigation = ({ tabs, activeTab, onTabChange, user, onSignOut }) => {
                       className="w-full px-4 py-2 text-left text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center space-x-2"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>Sign Out</span>
+                      <span>{t('auth.signOut')}</span>
                     </button>
                   </motion.div>
                 )}
